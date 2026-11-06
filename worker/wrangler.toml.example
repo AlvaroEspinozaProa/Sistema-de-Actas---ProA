@@ -1,0 +1,6 @@
+name = "proa-actas-api"
+main = "src/index.js"
+compatibility_date = "2026-11-06"
+
+# Configure with: wrangler secret put GOOGLE_CLIENT_ID (and each secret below)
+# GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, SPREADSHEET_ID, ALLOWED_ORIGIN

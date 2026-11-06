@@ -1,0 +1,11 @@
+import {serviceToken} from "./auth.js";
+const BASE="https://sheets.googleapis.com/v4/spreadsheets";
+export const ACCESS_HEADERS=["email","role","active","updatedAt","updatedBy"];
+export const STUDENT_HEADERS=["recordId","revisionId","previousRevisionId","version","status","createdAt","createdBy","updatedAt","updatedBy","fechaHecho","curso","estudiante","mailTutor","motivo","hechos","intervenciones","acuerdos"];
+export const TEACHER_HEADERS=["recordId","revisionId","previousRevisionId","version","status","createdAt","createdBy","updatedAt","updatedBy","fecha","tema","participantes","descripcion","acuerdos","responsable"];
+async function accessToken(env){const assertion=await serviceToken(env);const response=await fetch("https://oauth2.googleapis.com/token",{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion})});if(!response.ok)throw new Error("No se pudo autenticar el servicio de planillas.");return (await response.json()).access_token}
+async function request(env,path,options={}){const response=await fetch(`${BASE}/${env.SPREADSHEET_ID}${path}`,{...options,headers:{authorization:`Bearer ${await accessToken(env)}`,"content-type":"application/json",...options.headers}});if(!response.ok)throw new Error("No se pudo acceder a la planilla. Verificá su configuración y permisos.");return response.status===204?null:response.json()}
+export async function values(env,range){return (await request(env,`/values/${encodeURIComponent(range)}`)).values||[]}
+export async function append(env,sheet,row){await request(env,`/values/${encodeURIComponent(`${sheet}!A:Z`)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{method:"POST",body:JSON.stringify({values:[row]})})}
+export async function ensureHeader(env,sheet,headers){const rows=await values(env,`${sheet}!1:1`);if(rows[0]?.join("|")===headers.join("|"))return;if(rows.length)throw new Error(`La hoja ${sheet} no tiene la estructura esperada. No se modificó.`);await append(env,sheet,headers)}
+export const objectRows=(rows,headers)=>rows.slice(1).map(row=>Object.fromEntries(headers.map((key,index)=>[key,row[index]??""])));

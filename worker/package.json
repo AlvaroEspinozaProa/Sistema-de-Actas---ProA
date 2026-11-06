@@ -1,0 +1,1 @@
+{"name":"proa-actas-worker","private":true,"type":"module","dependencies":{"jose":"^6.0.10"},"devDependencies":{"wrangler":"^4.13.2"}}

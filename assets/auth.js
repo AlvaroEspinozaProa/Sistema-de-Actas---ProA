@@ -1,0 +1,2 @@
+import {api,setToken} from "./api.js";
+export function initAuth(onSession,onError){const start=()=>{if(!window.google)return setTimeout(start,100);google.accounts.id.initialize({client_id:globalThis.PROA_GOOGLE_CLIENT_ID||"CONFIGURAR_CLIENT_ID",callback:async({credential})=>{try{setToken(credential);onSession(await api("/auth/session",{method:"POST",body:"{}"}))}catch(error){onError(error)}}});google.accounts.id.renderButton(document.querySelector("#google-button"),{theme:"outline",size:"large",text:"signin_with",locale:"es"})};start()}

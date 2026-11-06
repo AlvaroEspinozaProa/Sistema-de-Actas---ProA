@@ -1,0 +1,5 @@
+const CACHE="proa-actas-static-v1";
+const STATIC=["./","./index.html","./assets/styles.css","./assets/config.js","./assets/app.js","./assets/api.js","./assets/auth.js","./assets/voice.js","./assets/icons/icon-192.png","./assets/icons/icon-512.png","./manifest.webmanifest"];
+self.addEventListener("install",event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(STATIC))));
+self.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));
+self.addEventListener("fetch",event=>{const url=new URL(event.request.url),cacheable=STATIC.some(file=>file==="./"?url.pathname.endsWith("/"):url.pathname.endsWith(file.slice(1)));if(event.request.method!=="GET"||url.origin!==location.origin||!cacheable)return;event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request)));});

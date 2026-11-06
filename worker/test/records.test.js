@@ -1,0 +1,9 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {hasRevisionConflict,latest,latestAccess,validateRecord} from "../src/model.js";
+test("latest keeps only the newest active revision",()=>{const records=latest([{recordId:"a",version:"1",status:"active"},{recordId:"a",version:"2",status:"active"},{recordId:"b",version:"1",status:"archived"}]);assert.deepEqual(records,[{recordId:"a",version:"2",status:"active"}])});
+test("student validation protects required fields and course",()=>{assert.throws(()=>validateRecord("student",{fechaHecho:"2026-01-01",curso:"7°",estudiante:"A",mailTutor:"not-email",motivo:"M",hechos:"H"}));assert.doesNotThrow(()=>validateRecord("student",{fechaHecho:"2026-01-01",curso:"1°",estudiante:"A",mailTutor:"tutor@example.com",motivo:"M",hechos:"H"}))});
+test("teacher validation requires meeting fields",()=>assert.throws(()=>validateRecord("teacher",{fecha:"2026-01-01",tema:"T"})));
+test("latest access revision disables a previously authorized account",()=>{const users=latestAccess([{email:"DOCENTE@escuelasproa.edu.ar",active:"true",updatedAt:"2026-01-01"},{email:"docente@escuelasproa.edu.ar",active:"false",updatedAt:"2026-02-01"}]);assert.equal(users[0].active,"false")});
+test("revision comparison identifies an outdated editor",()=>{assert.equal(hasRevisionConflict("newer","older"),true);assert.equal(hasRevisionConflict("same","same"),false)});
+test("only exact course values are accepted",()=>assert.throws(()=>validateRecord("student",{fechaHecho:"2026-01-01",curso:"10°",estudiante:"A",mailTutor:"tutor@example.com",motivo:"M",hechos:"H"})));
