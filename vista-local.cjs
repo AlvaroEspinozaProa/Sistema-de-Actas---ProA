@@ -21,8 +21,8 @@ http.createServer((req, res) => {
     res.end(data);
   });
 }).listen(4173, '127.0.0.1', () => {
-  console.log('Vista local: http://localhost:4173 — cerrar esta ventana para detener.');
-  if (process.platform === 'win32') require('node:child_process').execFile('rundll32.exe', ['url.dll,FileProtocolHandler', 'http://localhost:4173']);
+  console.log('Vista local: http://localhost:4173/?demo=1 — cerrar esta ventana para detener.');
+  if (process.platform === 'win32') require('node:child_process').execFile('rundll32.exe', ['url.dll,FileProtocolHandler', 'http://localhost:4173/?demo=1']);
 });
 for (const directory of [root, path.join(root, 'assets')]) fs.watch(directory, {recursive:true}, (_, name) => {
   if (name && /\.(html|css|js|json|webmanifest|png|svg)$/.test(name)) for (const client of clients) client.write('data: recargar\n\n');
